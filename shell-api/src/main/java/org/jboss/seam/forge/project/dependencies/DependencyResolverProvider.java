@@ -1,5 +1,5 @@
 /*
- * JBoss, Home of Professional Open Source
+ * JBoss, by Red Hat.
  * Copyright 2011, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -21,9 +21,9 @@
  */
 package org.jboss.seam.forge.project.dependencies;
 
-import java.util.List;
-
 import org.jboss.seam.forge.resources.DependencyResource;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>

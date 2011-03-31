@@ -1,6 +1,6 @@
 /*
  * JBoss, by Red Hat.
- * Copyright 2010, Red Hat, Inc., and individual contributors
+ * Copyright 2011, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -25,12 +25,7 @@ package org.jboss.seam.forge.shell;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CompositePluginClassLoader extends ClassLoader
 {

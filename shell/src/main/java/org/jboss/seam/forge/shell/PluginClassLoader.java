@@ -1,6 +1,6 @@
 /*
  * JBoss, by Red Hat.
- * Copyright 2010, Red Hat, Inc., and individual contributors
+ * Copyright 2011, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -21,12 +21,12 @@
  */
 package org.jboss.seam.forge.shell;
 
+import org.jboss.seam.forge.shell.PluginJar.IllegalNameException;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import org.jboss.seam.forge.shell.PluginJar.IllegalNameException;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>

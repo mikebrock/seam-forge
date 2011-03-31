@@ -1,5 +1,5 @@
 /*
- * JBoss, Home of Professional Open Source
+ * JBoss, by Red Hat.
  * Copyright 2011, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -21,17 +21,16 @@
  */
 package org.jboss.seam.forge.project.dependencies;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ServiceLoader;
+import org.jboss.seam.forge.resources.DependencyResource;
+import org.jboss.seam.forge.shell.util.BeanManagerUtils;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.jboss.seam.forge.resources.DependencyResource;
-import org.jboss.seam.forge.shell.util.BeanManagerUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>

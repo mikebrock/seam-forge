@@ -22,19 +22,11 @@
 
 package org.jboss.seam.forge.resources;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.jboss.seam.forge.project.ProjectModelException;
 import org.jboss.seam.forge.project.services.ResourceFactory;
 import org.jboss.seam.forge.shell.util.OSUtils;
+
+import java.io.*;
 
 /**
  * A standard, built-in resource for representing files on the filesystem.
@@ -269,7 +261,7 @@ public abstract class FileResource<T extends FileResource<?>> extends AbstractRe
 
          file.delete();
 
-         OutputStream out = new FileOutputStream(file);
+         OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
          try
          {
             byte buf[] = new byte[1024];
