@@ -48,25 +48,17 @@ public class ExecutionParser
 {
    private final PluginRegistry registry;
    private final Instance<Execution> executionInstance;
-   private final Tokenizer tokenizer;
    private final Shell shell;
    private final PromptTypeConverter promptTypeConverter;
 
    @Inject
    public ExecutionParser(final PluginRegistry registry, final Instance<Execution> executionInstance,
-                          final Tokenizer tokenizer, final Shell shell,
-                          final PromptTypeConverter promptTypeConverter)
+                          final Shell shell, final PromptTypeConverter promptTypeConverter)
    {
       this.registry = registry;
       this.executionInstance = executionInstance;
-      this.tokenizer = tokenizer;
       this.shell = shell;
       this.promptTypeConverter = promptTypeConverter;
-   }
-
-   public Execution parse(final String line)
-   {
-      return parse(tokenizer.tokenize(line), null, null);
    }
 
    @SuppressWarnings({ "unchecked", "rawtypes" })

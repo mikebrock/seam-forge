@@ -22,32 +22,16 @@
 
 package org.jboss.seam.forge.shell.plugins.builtin;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
 import org.jboss.seam.forge.git.GitUtils;
 import org.jboss.seam.forge.project.Project;
-import org.jboss.seam.forge.project.dependencies.Dependency;
-import org.jboss.seam.forge.project.dependencies.DependencyBuilder;
-import org.jboss.seam.forge.project.dependencies.DependencyRepository;
-import org.jboss.seam.forge.project.dependencies.DependencyRepositoryImpl;
-import org.jboss.seam.forge.project.dependencies.DependencyResolver;
+import org.jboss.seam.forge.project.dependencies.*;
 import org.jboss.seam.forge.project.facets.DependencyFacet;
 import org.jboss.seam.forge.project.facets.DependencyFacet.KnownRepository;
 import org.jboss.seam.forge.project.facets.MetadataFacet;
 import org.jboss.seam.forge.project.facets.PackagingFacet;
-import org.jboss.seam.forge.resources.DependencyResource;
-import org.jboss.seam.forge.resources.DirectoryResource;
-import org.jboss.seam.forge.resources.FileResource;
-import org.jboss.seam.forge.resources.Resource;
-import org.jboss.seam.forge.resources.ResourceFilter;
+import org.jboss.seam.forge.resources.*;
 import org.jboss.seam.forge.shell.PluginJar;
 import org.jboss.seam.forge.shell.PluginJar.IllegalNameException;
 import org.jboss.seam.forge.shell.Shell;
@@ -55,17 +39,17 @@ import org.jboss.seam.forge.shell.ShellColor;
 import org.jboss.seam.forge.shell.ShellMessages;
 import org.jboss.seam.forge.shell.events.ReinitializeEnvironment;
 import org.jboss.seam.forge.shell.exceptions.Abort;
-import org.jboss.seam.forge.shell.plugins.Alias;
-import org.jboss.seam.forge.shell.plugins.Command;
-import org.jboss.seam.forge.shell.plugins.DefaultCommand;
-import org.jboss.seam.forge.shell.plugins.Help;
-import org.jboss.seam.forge.shell.plugins.Option;
-import org.jboss.seam.forge.shell.plugins.PipeOut;
-import org.jboss.seam.forge.shell.plugins.Plugin;
-import org.jboss.seam.forge.shell.plugins.Topic;
+import org.jboss.seam.forge.shell.plugins.*;
 import org.jboss.seam.forge.shell.util.PluginRef;
 import org.jboss.seam.forge.shell.util.PluginUtil;
 import org.jboss.shrinkwrap.descriptor.impl.base.Strings;
+
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -289,28 +273,26 @@ public class ForgePlugin implements Plugin
    @Command(value = "mvn-plugin",
             help = "Download and install a plugin from a maven repository")
    public void installFromMvnRepos(@Option(description = "plugin-identifier", required = true) Dependency dep,
-            @Option(description = "target repository") KnownRepository repo,
+            @Option(name = "knownRepo", description = "target repository") KnownRepository repo,
+            @Option(name = "repoUrl", description = "target repository URL") String repoURL,
             final PipeOut out) throws Exception
    {
-      if (KnownRepository.CUSTOM.equals(repo))
+      if (repoURL != null)
       {
          installFromMvnRepos(dep, out,
-                  new DependencyRepositoryImpl("custom", shell.prompt("What is the repository URL?")));
+                  new DependencyRepositoryImpl("custom", repoURL));
       }
       else if (repo == null)
       {
          List<DependencyRepository> repos = new ArrayList<DependencyRepository>();
          for (KnownRepository r : KnownRepository.values())
          {
-            if (!KnownRepository.CUSTOM.equals(r))
-            {
-               repos.add(new DependencyRepositoryImpl(r.getId(), r.getUrl()));
-            }
+            repos.add(new DependencyRepositoryImpl(r));
          }
          installFromMvnRepos(dep, out, repos);
       }
       else
-         installFromMvnRepos(dep, out, new DependencyRepositoryImpl("custom", repo.getUrl()));
+         installFromMvnRepos(dep, out, new DependencyRepositoryImpl(repo));
    }
 
    @Command(value = "jar-plugin",
@@ -467,7 +449,7 @@ public class ForgePlugin implements Plugin
 
          ShellMessages.info(out, "Invoking build with underlying build system.");
          Resource<?> artifact = project.getFacet(PackagingFacet.class).executeBuild();
-         if (artifact.exists())
+         if (artifact != null && artifact.exists())
          {
             MetadataFacet meta = project.getFacet(MetadataFacet.class);
             Dependency dep = meta.getOutputDependency();

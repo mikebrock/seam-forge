@@ -1,5 +1,5 @@
 /*
- * JBoss, by Red Hat.
+ * JBoss, Home of Professional Open Source
  * Copyright 2011, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -28,7 +28,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -37,7 +36,7 @@ import java.util.ServiceLoader;
  * 
  */
 @Singleton
-public class DependencyResolver
+public class DependencyResolver implements DependencyResolverProvider
 {
    @Inject
    private BeanManager manager;
@@ -71,17 +70,13 @@ public class DependencyResolver
       }
    }
 
-   public List<DependencyResource> resolveArtifacts(final Dependency dep, final DependencyRepository repository)
-   {
-      return resolveArtifacts(dep, Arrays.asList(repository));
-   }
-
-   public List<DependencyResource> resolveArtifacts(final Dependency dep, final List<DependencyRepository> repositories)
+   @Override
+   public List<DependencyResource> resolveArtifacts(Dependency query)
    {
       init();
       for (DependencyResolverProvider p : providers)
       {
-         List<DependencyResource> artifacts = p.resolveArtifacts(dep, repositories);
+         List<DependencyResource> artifacts = p.resolveArtifacts(query);
          if (artifacts != null && !artifacts.isEmpty())
          {
             return artifacts;
@@ -90,13 +85,29 @@ public class DependencyResolver
       return new ArrayList<DependencyResource>();
    }
 
-   public List<DependencyResource> resolveDependencies(final Dependency dep,
+   @Override
+   public List<DependencyResource> resolveArtifacts(final Dependency query, final DependencyRepository repository)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<DependencyResource> artifacts = p.resolveArtifacts(query, repository);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<DependencyResource>();
+   }
+
+   @Override
+   public List<DependencyResource> resolveArtifacts(final Dependency query,
             final List<DependencyRepository> repositories)
    {
       init();
       for (DependencyResolverProvider p : providers)
       {
-         List<DependencyResource> artifacts = p.resolveDependencies(dep, repositories);
+         List<DependencyResource> artifacts = p.resolveArtifacts(query, repositories);
          if (artifacts != null && !artifacts.isEmpty())
          {
             return artifacts;
@@ -105,17 +116,105 @@ public class DependencyResolver
       return new ArrayList<DependencyResource>();
    }
 
-   public List<Dependency> resolveVersions(final Dependency dep, final DependencyRepository repository)
-   {
-      return resolveVersions(dep, Arrays.asList(repository));
-   }
-
-   public List<Dependency> resolveVersions(final Dependency dep, final List<DependencyRepository> repositories)
+   @Override
+   public List<DependencyResource> resolveDependencies(final Dependency query)
    {
       init();
       for (DependencyResolverProvider p : providers)
       {
-         List<Dependency> artifacts = p.resolveVersions(dep, repositories);
+         List<DependencyResource> artifacts = p.resolveDependencies(query);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<DependencyResource>();
+   }
+
+   @Override
+   public List<DependencyResource> resolveDependencies(final Dependency query,
+            final DependencyRepository repository)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<DependencyResource> artifacts = p.resolveDependencies(query, repository);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<DependencyResource>();
+   }
+
+   @Override
+   public List<DependencyResource> resolveDependencies(final Dependency query,
+            final List<DependencyRepository> repositories)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<DependencyResource> artifacts = p.resolveDependencies(query, repositories);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<DependencyResource>();
+   }
+
+   @Override
+   public DependencyMetadata resolveDependencyMetadata(Dependency query)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         DependencyMetadata meta = p.resolveDependencyMetadata(query);
+         if (meta != null)
+         {
+            return meta;
+         }
+      }
+      return null;
+   }
+
+   @Override
+   public DependencyMetadata resolveDependencyMetadata(Dependency query, DependencyRepository repository)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         DependencyMetadata meta = p.resolveDependencyMetadata(query, repository);
+         if (meta != null)
+         {
+            return meta;
+         }
+      }
+      return null;
+   }
+
+   @Override
+   public DependencyMetadata resolveDependencyMetadata(Dependency query, List<DependencyRepository> repositories)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         DependencyMetadata meta = p.resolveDependencyMetadata(query, repositories);
+         if (meta != null)
+         {
+            return meta;
+         }
+      }
+      return null;
+   }
+
+   @Override
+   public List<Dependency> resolveVersions(final Dependency query)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<Dependency> artifacts = p.resolveVersions(query);
          if (artifacts != null && !artifacts.isEmpty())
          {
             return artifacts;
@@ -124,4 +223,33 @@ public class DependencyResolver
       return new ArrayList<Dependency>();
    }
 
+   @Override
+   public List<Dependency> resolveVersions(final Dependency query, final DependencyRepository repository)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<Dependency> artifacts = p.resolveVersions(query, repository);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<Dependency>();
+   }
+
+   @Override
+   public List<Dependency> resolveVersions(final Dependency query, final List<DependencyRepository> repositories)
+   {
+      init();
+      for (DependencyResolverProvider p : providers)
+      {
+         List<Dependency> artifacts = p.resolveVersions(query, repositories);
+         if (artifacts != null && !artifacts.isEmpty())
+         {
+            return artifacts;
+         }
+      }
+      return new ArrayList<Dependency>();
+   }
 }

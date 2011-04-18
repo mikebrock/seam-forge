@@ -21,32 +21,21 @@
  */
 package org.jboss.seam.forge.project.facets.builtin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.jboss.seam.forge.project.Facet;
-import org.jboss.seam.forge.project.dependencies.Dependency;
-import org.jboss.seam.forge.project.dependencies.DependencyBuilder;
-import org.jboss.seam.forge.project.dependencies.DependencyRepository;
-import org.jboss.seam.forge.project.dependencies.DependencyRepositoryImpl;
-import org.jboss.seam.forge.project.dependencies.DependencyResolver;
-import org.jboss.seam.forge.project.dependencies.MavenDependencyAdapter;
+import org.jboss.seam.forge.project.dependencies.*;
 import org.jboss.seam.forge.project.facets.BaseFacet;
 import org.jboss.seam.forge.project.facets.DependencyFacet;
 import org.jboss.seam.forge.project.facets.FacetNotFoundException;
 import org.jboss.seam.forge.project.facets.MavenCoreFacet;
 import org.jboss.seam.forge.shell.plugins.Alias;
 import org.jboss.seam.forge.shell.plugins.RequiresFacet;
+
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -254,13 +243,16 @@ public class MavenDependencyFacet extends BaseFacet implements DependencyFacet, 
    @Override
    public void addRepository(final String name, final String url)
    {
-      MavenCoreFacet maven = project.getFacet(MavenCoreFacet.class);
-      Model pom = maven.getPOM();
-      Repository repo = new Repository();
-      repo.setId(name);
-      repo.setUrl(url);
-      pom.getRepositories().add(repo);
-      maven.setPOM(pom);
+      if (!hasRepository(url))
+      {
+         MavenCoreFacet maven = project.getFacet(MavenCoreFacet.class);
+         Model pom = maven.getPOM();
+         Repository repo = new Repository();
+         repo.setId(name);
+         repo.setUrl(url);
+         pom.getRepositories().add(repo);
+         maven.setPOM(pom);
+      }
    }
 
    @Override

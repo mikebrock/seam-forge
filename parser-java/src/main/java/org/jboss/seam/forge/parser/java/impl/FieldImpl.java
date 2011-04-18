@@ -22,28 +22,18 @@
 
 package org.jboss.seam.forge.parser.java.impl;
 
-import java.util.List;
-
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.PrimitiveType.Code;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.jboss.seam.forge.parser.JavaParser;
 import org.jboss.seam.forge.parser.java.Annotation;
-import org.jboss.seam.forge.parser.java.Field;
-import org.jboss.seam.forge.parser.java.JavaClass;
-import org.jboss.seam.forge.parser.java.JavaSource;
-import org.jboss.seam.forge.parser.java.Visibility;
+import org.jboss.seam.forge.parser.java.*;
 import org.jboss.seam.forge.parser.java.ast.AnnotationAccessor;
 import org.jboss.seam.forge.parser.java.ast.ModifierAccessor;
 import org.jboss.seam.forge.parser.java.util.Strings;
 import org.jboss.seam.forge.parser.java.util.Types;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -169,6 +159,38 @@ public class FieldImpl<O extends JavaSource<O>> implements Field<O>
    /*
     * Visibility Modifiers
     */
+
+   @Override
+   public boolean isFinal()
+   {
+      return modifiers.hasModifier(field, ModifierKeyword.FINAL_KEYWORD);
+   }
+
+   @Override
+   public Field<O> setFinal(boolean finl)
+   {
+      if (finl)
+         modifiers.addModifier(field, ModifierKeyword.FINAL_KEYWORD);
+      else
+         modifiers.removeModifier(field, ModifierKeyword.FINAL_KEYWORD);
+      return this;
+   }
+
+   @Override
+   public boolean isStatic()
+   {
+      return modifiers.hasModifier(field, ModifierKeyword.STATIC_KEYWORD);
+   }
+
+   @Override
+   public Field<O> setStatic(boolean statc)
+   {
+      if (statc)
+         modifiers.addModifier(field, ModifierKeyword.STATIC_KEYWORD);
+      else
+         modifiers.removeModifier(field, ModifierKeyword.STATIC_KEYWORD);
+      return this;
+   }
 
    @Override
    public boolean isPackagePrivate()

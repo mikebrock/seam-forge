@@ -32,8 +32,9 @@
 		<module>shell-api</module>
 		<module>test-harness</module>
 		<module>shell</module>
-		<module>j2ee-plugins</module>
+		<module>java-ee6-plugins</module>
 		<module>scaffold-plugin</module>
+		<module>scaffold-metawidget</module>
 		<module>dev-plugins</module>
 	</modules>
 
@@ -44,11 +45,11 @@
 		<cdi.version>1.0-SP4</cdi.version>
 		<groovy.version>1.7.5</groovy.version>
 		<jboss.logging.version>3.0.0.Beta4</jboss.logging.version>
-		<jboss.javaee.version>1.0.0.CR1</jboss.javaee.version>
+		<jboss.javaee.version>1.0.0.Final</jboss.javaee.version>
 		<junit.version>4.8.1</junit.version>
 		<log4j.version>1.2.16</log4j.version>
 		<shrinkwrap.version>1.0.0-alpha-11</shrinkwrap.version>
-		<shrinkwrap.descriptors.version>0.1.4</shrinkwrap.descriptors.version>
+		<shrinkwrap.descriptors.version>0.1.7-SNAPSHOT</shrinkwrap.descriptors.version>
 		<slf4j.version>1.5.10</slf4j.version>
 		<weld.version>1.1.0.Final</weld.version>
 		<weld.bom.version>1.1.0.Final</weld.bom.version>
@@ -109,7 +110,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.seam.forge</groupId>
-				<artifactId>forge-j2ee-plugins</artifactId>
+				<artifactId>forge-javaee-6.0-plugins</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.seam.forge</groupId>
+				<artifactId>forge-scaffold</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

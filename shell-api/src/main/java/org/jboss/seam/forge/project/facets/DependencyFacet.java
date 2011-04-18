@@ -21,14 +21,14 @@
  */
 package org.jboss.seam.forge.project.facets;
 
-import java.util.List;
-import java.util.Map;
-
 import org.jboss.seam.forge.project.Facet;
 import org.jboss.seam.forge.project.Project;
 import org.jboss.seam.forge.project.dependencies.Dependency;
 import org.jboss.seam.forge.project.dependencies.DependencyBuilder;
 import org.jboss.seam.forge.project.dependencies.DependencyRepository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -40,8 +40,7 @@ public interface DependencyFacet extends Facet
       CENTRAL("http://repo1.maven.org/maven2/"),
       JBOSS_NEXUS("http://repository.jboss.org/nexus/content/groups/public"),
       JBOSS_LEGACY("http://repository.jboss.org/maven2"),
-      JAVA_NET("http://download.java.net/maven/2/"),
-      CUSTOM(null);
+      JAVA_NET("http://download.java.net/maven/2/");
 
       private final String url;
 

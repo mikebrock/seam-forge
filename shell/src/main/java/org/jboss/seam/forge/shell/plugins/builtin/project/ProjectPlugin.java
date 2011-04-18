@@ -22,13 +22,6 @@
 
 package org.jboss.seam.forge.shell.plugins.builtin.project;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-
 import org.jboss.seam.forge.project.Facet;
 import org.jboss.seam.forge.project.Project;
 import org.jboss.seam.forge.project.dependencies.Dependency;
@@ -46,17 +39,14 @@ import org.jboss.seam.forge.shell.Shell;
 import org.jboss.seam.forge.shell.ShellColor;
 import org.jboss.seam.forge.shell.ShellMessages;
 import org.jboss.seam.forge.shell.events.InstallFacets;
-import org.jboss.seam.forge.shell.plugins.Alias;
-import org.jboss.seam.forge.shell.plugins.Command;
-import org.jboss.seam.forge.shell.plugins.DefaultCommand;
-import org.jboss.seam.forge.shell.plugins.Help;
-import org.jboss.seam.forge.shell.plugins.Option;
-import org.jboss.seam.forge.shell.plugins.PipeOut;
-import org.jboss.seam.forge.shell.plugins.Plugin;
-import org.jboss.seam.forge.shell.plugins.RequiresFacet;
-import org.jboss.seam.forge.shell.plugins.RequiresProject;
-import org.jboss.seam.forge.shell.plugins.Topic;
+import org.jboss.seam.forge.shell.plugins.*;
 import org.jboss.seam.forge.shell.util.ConstraintInspector;
+
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -79,8 +69,8 @@ public class ProjectPlugin implements Plugin
    }
 
    @Inject
-   public ProjectPlugin(final Project project, final Shell shell, FacetFactory factory,
-            Event<InstallFacets> installFacets)
+   public ProjectPlugin(final Project project, final Shell shell, final FacetFactory factory,
+            final Event<InstallFacets> installFacets)
    {
       this.project = project;
       this.shell = shell;
@@ -101,14 +91,6 @@ public class ProjectPlugin implements Plugin
       out.println(project.getFacet(PackagingFacet.class).getPackagingType().getType());
       out.print(ShellColor.BOLD, " dir:  ");
       out.println(project.getProjectRoot().getFullyQualifiedName());
-   }
-
-   @Command("build")
-   public void build(PipeOut out,
-            @Option(description = "build arguments") String... args)
-   {
-      PackagingFacet packaging = project.getFacet(PackagingFacet.class);
-      packaging.executeBuild(args);
    }
 
    @Command("install-facet")
@@ -343,38 +325,40 @@ public class ProjectPlugin implements Plugin
    /*
     * Repositories
     */
-   @Command("add-repository")
+   @Command("add-known-repository")
    public void repoAdd(
             @Option(description = "type...", required = true) final KnownRepository repo,
             final PipeOut out)
    {
       DependencyFacet deps = project.getFacet(DependencyFacet.class);
 
-      if (KnownRepository.CUSTOM.equals(repo))
+      if (deps.hasRepository(repo))
       {
-         String name = shell.prompt("What is the name of the repository?");
-         String url = shell.prompt("What is the URL of the repository?");
-         if (deps.hasRepository(url))
-         {
-            out.println("Repository exists [" + url + "]");
-         }
-         else
-         {
-            deps.addRepository(name, url);
-            out.println("Added repository [" + name + "->" + url + "]");
-         }
+         out.println("Repository exists [" + repo.name() + "->" + repo.getUrl() + "]");
       }
       else
       {
-         if (deps.hasRepository(repo))
-         {
-            out.println("Repository exists [" + repo.name() + "->" + repo.getUrl() + "]");
-         }
-         else
-         {
-            deps.addRepository(repo);
-            out.println("Added repository [" + repo.name() + "->" + repo.getUrl() + "]");
-         }
+         deps.addRepository(repo);
+         out.println("Added repository [" + repo.name() + "->" + repo.getUrl() + "]");
+      }
+   }
+
+   @Command("add-repository")
+   public void repoAdd(
+            @Option(description = "repository name...", required = true) final String name,
+            @Option(description = "repository URL...", required = true) final String url,
+            final PipeOut out)
+   {
+      DependencyFacet deps = project.getFacet(DependencyFacet.class);
+
+      if (deps.hasRepository(url))
+      {
+         out.println("Repository exists [" + url + "]");
+      }
+      else
+      {
+         deps.addRepository(name, url);
+         out.println("Added repository [" + name + "->" + url + "]");
       }
    }
 

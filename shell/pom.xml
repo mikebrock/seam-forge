@@ -165,6 +165,17 @@
             <enabled>true</enabled>
          </snapshots>
       </repository>
+      <repository>
+         <id>sonatype</id>
+         <url>https://repository.sonatype.org/</url>
+         <layout>default</layout>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+      </repository>
    </repositories>
 
    <build>

@@ -22,14 +22,6 @@
 
 package org.jboss.seam.forge.project.dependencies;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.seam.forge.project.facets.DependencyFacet.KnownRepository;
@@ -38,6 +30,13 @@ import org.jboss.seam.forge.test.project.util.ProjectModelTest;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -58,7 +57,7 @@ public class RepositoryLookupTest extends ProjectModelTest
    private DependencyResolver resolver;
 
    @Test
-   public void testResolveVersionsWithResolver() throws Exception
+   public void testResolveVersions() throws Exception
    {
       Dependency dep = DependencyBuilder.create("com.ocpsoft:prettyfaces-jsf2");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.CENTRAL);
@@ -67,7 +66,7 @@ public class RepositoryLookupTest extends ProjectModelTest
    }
 
    @Test
-   public void testResolveVersionsWithResolverStaticVersion() throws Exception
+   public void testResolveVersionsStaticVersion() throws Exception
    {
       Dependency dep = DependencyBuilder.create("com.ocpsoft:prettyfaces-jsf2:3.2.0");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.CENTRAL);
@@ -76,7 +75,7 @@ public class RepositoryLookupTest extends ProjectModelTest
    }
 
    @Test
-   public void testResolveVersionsWithResolverStaticVersionSnapshot() throws Exception
+   public void testResolveVersionsStaticVersionSnapshot() throws Exception
    {
       Dependency dep = DependencyBuilder.create("org.jboss.errai.forge:forge-errai:1.0-SNAPSHOT");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.JBOSS_NEXUS);
@@ -85,7 +84,7 @@ public class RepositoryLookupTest extends ProjectModelTest
    }
 
    @Test
-   public void testResolveArtifactsWithResolver() throws Exception
+   public void testResolveArtifacts() throws Exception
    {
       Dependency dep = DependencyBuilder.create("org.jboss.errai.forge:forge-errai");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.JBOSS_NEXUS);
@@ -94,7 +93,7 @@ public class RepositoryLookupTest extends ProjectModelTest
    }
 
    @Test
-   public void testResolveArtifactsWithResolverSnapshotStaticVersion() throws Exception
+   public void testResolveArtifactsSnapshotStaticVersion() throws Exception
    {
       Dependency dep = DependencyBuilder.create("org.jboss.errai.forge:forge-errai:[1.0-SNAPSHOT]");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.JBOSS_NEXUS);
@@ -103,11 +102,30 @@ public class RepositoryLookupTest extends ProjectModelTest
    }
 
    @Test
-   public void testResolveArtifactsWithResolverStaticVersion() throws Exception
+   public void testResolveArtifactsStaticVersion() throws Exception
    {
       Dependency dep = DependencyBuilder.create("com.ocpsoft:prettyfaces-jsf2:[3.2.0]");
       DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.CENTRAL);
       List<DependencyResource> artifacts = resolver.resolveArtifacts(dep, Arrays.asList(repo));
       assertTrue(artifacts.size() >= 1);
+   }
+
+   @Test
+   public void testResolveDependenciesStaticVersion() throws Exception
+   {
+      Dependency dep = DependencyBuilder.create("org.jboss.seam.international:seam-international:[3.0.0,)");
+      DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.JBOSS_NEXUS);
+      List<DependencyResource> artifacts = resolver.resolveDependencies(dep, Arrays.asList(repo));
+      assertTrue(artifacts.size() >= 1);
+   }
+
+   @Test
+   public void testResolveDependencyMetadata() throws Exception
+   {
+      Dependency dep = DependencyBuilder.create("org.jboss.seam.international:seam-international:3.0.0.Final");
+      DependencyRepository repo = new DependencyRepositoryImpl(KnownRepository.JBOSS_NEXUS);
+      DependencyMetadata meta = resolver.resolveDependencyMetadata(dep, Arrays.asList(repo));
+      assertTrue(meta.getDependencies().size() >= 1);
+      assertTrue(meta.getManagedDependencies().size() >= 1);
    }
 }

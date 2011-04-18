@@ -22,9 +22,9 @@
 
 package org.jboss.seam.forge.parser.java;
 
-import java.util.List;
-
 import org.jboss.seam.forge.parser.Origin;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -43,8 +43,6 @@ public interface Method<O> extends Abstractable<Method<O>>, Member<O, Method<O>>
    public Method<O> setConstructor(final boolean constructor);
 
    public boolean isConstructor();
-
-   public Method<O> setFinal();
 
    public Method<O> setName(final String name);
 

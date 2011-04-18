@@ -22,19 +22,11 @@
 
 package org.jboss.seam.forge.shell.plugins.builtin;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-
 import org.jboss.seam.forge.parser.JavaParser;
 import org.jboss.seam.forge.parser.java.JavaClass;
 import org.jboss.seam.forge.project.Project;
-import org.jboss.seam.forge.project.facets.DependencyFacet;
+import org.jboss.seam.forge.project.facets.*;
 import org.jboss.seam.forge.project.facets.DependencyFacet.KnownRepository;
-import org.jboss.seam.forge.project.facets.JavaSourceFacet;
-import org.jboss.seam.forge.project.facets.MetadataFacet;
-import org.jboss.seam.forge.project.facets.PackagingFacet;
-import org.jboss.seam.forge.project.facets.ResourceFacet;
 import org.jboss.seam.forge.project.packaging.PackagingType;
 import org.jboss.seam.forge.project.services.ProjectFactory;
 import org.jboss.seam.forge.project.services.ResourceFactory;
@@ -45,15 +37,12 @@ import org.jboss.seam.forge.resources.ResourceException;
 import org.jboss.seam.forge.shell.PromptType;
 import org.jboss.seam.forge.shell.Shell;
 import org.jboss.seam.forge.shell.ShellMessages;
-import org.jboss.seam.forge.shell.plugins.Alias;
-import org.jboss.seam.forge.shell.plugins.DefaultCommand;
-import org.jboss.seam.forge.shell.plugins.Help;
-import org.jboss.seam.forge.shell.plugins.Option;
-import org.jboss.seam.forge.shell.plugins.PipeOut;
-import org.jboss.seam.forge.shell.plugins.Plugin;
-import org.jboss.seam.forge.shell.plugins.Topic;
+import org.jboss.seam.forge.shell.plugins.*;
 import org.jboss.seam.forge.shell.util.Files;
 import org.jboss.seam.forge.shell.util.ResourceUtil;
+
+import javax.inject.Inject;
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -90,6 +79,8 @@ public class NewProjectPlugin implements Plugin
                      required = false,
                      defaultValue = "false",
                      flagOnly = true) final boolean createMain,
+            @Option(name = "finalName",
+                     description = "The final artifact name of the new project") final String finalName,
             final PipeOut out
             ) throws IOException
    {
@@ -209,6 +200,15 @@ public class NewProjectPlugin implements Plugin
                   .setBody("System.out.println(\"Hi there! I was forged as part of the project you call " + name
                            + ".\");")
                   .getOrigin());
+      }
+
+      if (finalName != null)
+      {
+         packaging.setFinalName(finalName);
+      }
+      else
+      {
+         packaging.setFinalName(name);
       }
 
       project.getFacet(ResourceFacet.class).createResource("<forge/>".toCharArray(), "META-INF/forge.xml");

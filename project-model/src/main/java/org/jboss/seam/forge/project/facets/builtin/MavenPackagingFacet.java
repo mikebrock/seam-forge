@@ -21,12 +21,6 @@
  */
 package org.jboss.seam.forge.project.facets.builtin;
 
-import java.io.File;
-
-import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.jboss.seam.forge.project.Facet;
@@ -43,6 +37,11 @@ import org.jboss.seam.forge.shell.events.PackagingChanged;
 import org.jboss.seam.forge.shell.plugins.Alias;
 import org.jboss.seam.forge.shell.plugins.RequiresFacet;
 import org.jboss.shrinkwrap.descriptor.impl.base.Strings;
+
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import java.io.File;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -153,4 +152,20 @@ public class MavenPackagingFacet extends BaseFacet implements PackagingFacet, Fa
       }
    }
 
+   @Override
+   public String getFinalName()
+   {
+      MavenCoreFacet mavenFacet = project.getFacet(MavenCoreFacet.class);
+      Model pom = mavenFacet.getPOM();
+      return pom.getBuild().getFinalName();
+   }
+
+   @Override
+   public void setFinalName(String finalName)
+   {
+      MavenCoreFacet mavenFacet = project.getFacet(MavenCoreFacet.class);
+      Model pom = mavenFacet.getPOM();
+      pom.getBuild().setFinalName(finalName);
+      mavenFacet.setPOM(pom);
+   }
 }

@@ -22,12 +22,6 @@
 
 package org.jboss.seam.forge.project.facets.builtin;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -42,6 +36,12 @@ import org.jboss.seam.forge.project.ProjectModelException;
 import org.jboss.seam.forge.shell.util.OSUtils;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -64,40 +64,48 @@ public class MavenContainer
          container.setLoggerManager(loggerManager);
 
          builder = container.lookup(ProjectBuilder.class);
-
-         // TODO this needs to be configurable via .forge
-         // TODO this reference to the M2_REPO should probably be centralized
-         String localRepository = OSUtils.getUserHomeDir().getAbsolutePath() + "/.m2/repository";
-
-         request = new DefaultProjectBuildingRequest();
-         request.setLocalRepository(new MavenArtifactRepository(
-                  "local", new File(localRepository).toURI().toURL().toString(),
-                  container.lookup(ArtifactRepositoryLayout.class),
-                  new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER,
-                           ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN),
-                  new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER,
-                           ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN)));
-         request.setRemoteRepositories(new ArrayList<ArtifactRepository>());
-
-         DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
-         repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManager(localRepository));
-         repositorySession.setOffline(true);
-
-         request.setRepositorySession(repositorySession);
-         request.setProcessPlugins(true);
-         request.setResolveDependencies(true);
-
       }
       catch (Exception e)
       {
          throw new ProjectModelException(
-                  "Could not initialize maven", e);
+                  "Could not initialize Maven", e);
       }
    }
 
    public ProjectBuildingRequest getRequest()
    {
-      return request;
+      try
+      {
+         // TODO this needs to be configurable via .forge
+         // TODO this reference to the M2_REPO should probably be centralized
+         String localRepositoryPath = OSUtils.getUserHomeDir().getAbsolutePath() + "/.m2/repository";
+
+         request = new DefaultProjectBuildingRequest();
+         ArtifactRepository localRepository = new MavenArtifactRepository(
+                  "local", new File(localRepositoryPath).toURI().toURL().toString(),
+                  container.lookup(ArtifactRepositoryLayout.class),
+                  new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER,
+                           ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN),
+                  new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER,
+                           ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN));
+         request.setLocalRepository(localRepository);
+         request.setRemoteRepositories(new ArrayList<ArtifactRepository>());
+
+         DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
+         repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManager(localRepositoryPath));
+         repositorySession.setOffline(true);
+
+         request.setRepositorySession(repositorySession);
+         request.setProcessPlugins(false);
+         request.setPluginArtifactRepositories(Arrays.asList(localRepository));
+         request.setResolveDependencies(true);
+         return request;
+      }
+      catch (Exception e)
+      {
+         throw new ProjectModelException(
+                  "Could not create Maven project building request", e);
+      }
    }
 
    public ProjectBuilder getBuilder()

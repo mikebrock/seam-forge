@@ -22,16 +22,6 @@
 
 package org.jboss.seam.forge.scaffold.plugins;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-import javax.persistence.Entity;
-
 import org.jboss.seam.forge.parser.java.JavaClass;
 import org.jboss.seam.forge.parser.java.JavaSource;
 import org.jboss.seam.forge.project.Project;
@@ -40,26 +30,21 @@ import org.jboss.seam.forge.resources.FileResource;
 import org.jboss.seam.forge.resources.Resource;
 import org.jboss.seam.forge.resources.java.JavaResource;
 import org.jboss.seam.forge.scaffold.ScaffoldProvider;
-import org.jboss.seam.forge.scaffold.providers.MetawidgetScaffold;
+import org.jboss.seam.forge.scaffold.plugins.events.ScaffoldGeneratedResources;
 import org.jboss.seam.forge.scaffold.shell.ScaffoldProviderCompleter;
 import org.jboss.seam.forge.shell.ShellMessages;
-import org.jboss.seam.forge.shell.ShellPrintWriter;
 import org.jboss.seam.forge.shell.ShellPrompt;
-import org.jboss.seam.forge.shell.events.InstallFacets;
-import org.jboss.seam.forge.shell.plugins.Alias;
-import org.jboss.seam.forge.shell.plugins.Command;
-import org.jboss.seam.forge.shell.plugins.Current;
-import org.jboss.seam.forge.shell.plugins.Help;
-import org.jboss.seam.forge.shell.plugins.Option;
-import org.jboss.seam.forge.shell.plugins.PipeOut;
-import org.jboss.seam.forge.shell.plugins.Plugin;
-import org.jboss.seam.forge.shell.plugins.RequiresProject;
-import org.jboss.seam.forge.shell.plugins.Topic;
+import org.jboss.seam.forge.shell.plugins.*;
 import org.jboss.seam.forge.shell.util.ConstraintInspector;
-import org.jboss.seam.forge.spec.cdi.CDIFacet;
-import org.jboss.seam.forge.spec.jpa.PersistenceFacet;
-import org.jboss.seam.forge.spec.jsf.FacesFacet;
-import org.jboss.seam.forge.spec.servlet.ServletFacet;
+
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.persistence.Entity;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -78,126 +63,57 @@ public class ScaffoldPlugin implements Plugin
    @Inject
    private Project project;
    @Inject
-   private ShellPrintWriter writer;
-   @Inject
    private ShellPrompt prompt;
 
    @Inject
    private Instance<ScaffoldProvider> impls;
 
    @Inject
-   private MetawidgetScaffold defaultScaffold;
+   private Event<ScaffoldGeneratedResources> generatedEvent;
 
-   @Inject
-   private Event<InstallFacets> install;
-
-   @Command("setup")
-   @SuppressWarnings("unchecked")
-   public void setup(PipeOut out)
-   {
-      /*
-       * TODO this should probably accept a scaffold type object itself other methods should check to see if any
-       * scaffold providers have been installed
-       */
-      if (!(project.hasFacet(WebResourceFacet.class) && project.hasFacet(PersistenceFacet.class)
-               && project.hasFacet(CDIFacet.class) && project.hasFacet(FacesFacet.class)))
-      {
-         install.fire(new InstallFacets(WebResourceFacet.class, PersistenceFacet.class, CDIFacet.class,
-                  FacesFacet.class));
-
-         if (project.hasFacet(WebResourceFacet.class) && project.hasFacet(PersistenceFacet.class)
-                  && project.hasFacet(CDIFacet.class) && project.hasFacet(FacesFacet.class))
-         {
-            ShellMessages.success(out, "Scaffolding installed.");
-         }
-      }
-   }
-
-   @Command("create-indexes")
-   public void createIndex(
-            PipeOut out,
+   @Command("gen-indexes")
+   public void generateIndex(
+            final PipeOut out,
+            @Option(name = "scaffoldType", required = false,
+                     completer = ScaffoldProviderCompleter.class) final String scaffoldType,
             @Option(flagOnly = true, name = "overwrite") final boolean overwrite)
    {
-      setup(out);
-      WebResourceFacet web = project.getFacet(WebResourceFacet.class);
+      ScaffoldProvider provider = getScaffoldType(scaffoldType);
+      List<Resource<?>> generatedResources = provider.generateIndex(project, overwrite);
 
-      project.getFacet(ServletFacet.class).getConfig().welcomeFile("index.html");
-
-      createOrOverwrite(writer, web.getWebResource("index.html"), getClass()
-               .getResourceAsStream("/org/jboss/seam/forge/jsf/index.html"), overwrite);
-
-      createOrOverwrite(writer, web.getWebResource("index.xhtml"),
-               getClass().getResourceAsStream("/org/jboss/seam/forge/jsf/index.xhtml"), overwrite);
-
-      createDefaultTemplate(out, overwrite);
+      // TODO give plugins a chance to react to generated resources, use event bus?
+      if (!generatedResources.isEmpty())
+         generatedEvent.fire(new ScaffoldGeneratedResources(provider, generatedResources));
    }
 
-   @Command("create-default-template")
-   public void createDefaultTemplate(
+   @Command("gen-templates")
+   public void generateTemplates(
+            @Option(name = "scaffoldType", required = false,
+                     completer = ScaffoldProviderCompleter.class) final String scaffoldType,
             final PipeOut out,
             @Option(flagOnly = true, name = "overwrite") final boolean overwrite)
    {
-      setup(out);
-      WebResourceFacet web = project.getFacet(WebResourceFacet.class);
-
-      createOrOverwrite(writer, web.getWebResource("/resources/forge-template.xhtml"),
-               getClass().getResourceAsStream("/org/jboss/seam/forge/jsf/forge-template.xhtml"), overwrite);
-
-      createOrOverwrite(writer, web.getWebResource("/resources/forge.css"),
-               getClass().getResourceAsStream("/org/jboss/seam/forge/jsf/forge.css"), overwrite);
-
-      createOrOverwrite(writer, web.getWebResource("/resources/favicon.ico"),
-               getClass().getResourceAsStream("/org/jboss/seam/forge/web/favicon.ico"), overwrite);
-   }
-
-   @Command("from-entity")
-   public void generateFromEntity(
-            @Option(name = "scaffoldType", required = false,
-                     completer = ScaffoldProviderCompleter.class) final String scaffoldType,
-            @Option(flagOnly = true, name = "overwrite") final boolean overwrite,
-            @Option(required = false) JavaResource[] targets,
-            final PipeOut out) throws FileNotFoundException
-   {
-      setup(out);
-      if (((targets == null) || (targets.length < 1))
-               && (currentResource instanceof JavaResource))
-      {
-         targets = new JavaResource[] { (JavaResource) currentResource };
-      }
-
-      List<JavaResource> javaTargets = selectTargets(out, targets);
-      if (javaTargets.isEmpty())
-      {
-         ShellMessages.error(out, "Must specify a domain entity on which to operate.");
-         return;
-      }
-
       ScaffoldProvider provider = getScaffoldType(scaffoldType);
-      if (provider == null)
-      {
-         ShellMessages.error(out, "Aborted - no scaffold type selected.");
-         return;
-      }
+      List<Resource<?>> generatedResources = provider.generateTemplates(project, overwrite);
 
-      if (!provider.isInstalledIn(project))
-      {
-         provider.installInto(project);
-      }
-
-      createDefaultTemplate(out, overwrite);
-
-      for (JavaResource jr : javaTargets)
-      {
-         JavaClass entity = (JavaClass) (jr).getJavaSource();
-         provider.fromEntity(project, entity, overwrite);
-         ShellMessages.success(out, "Generated UI for [" + entity.getQualifiedName() + "]");
-      }
-
+      // TODO give plugins a chance to react to generated resources, use event bus?
+      if (!generatedResources.isEmpty())
+         generatedEvent.fire(new ScaffoldGeneratedResources(provider, generatedResources));
    }
 
-   private ScaffoldProvider getScaffoldType(final String scaffoldType)
+   private ScaffoldProvider getScaffoldType(String scaffoldType)
    {
       ScaffoldProvider scaffoldImpl = null;
+      if (scaffoldType == null
+               && prompt.promptBoolean("No scaffold type was selected, use default (Metawidget & JSF)?"))
+      {
+         scaffoldType = "metawidget";
+      }
+      else if (scaffoldType == null)
+      {
+         throw new RuntimeException("Re-run with --scaffoldType {...}");
+      }
+
       for (ScaffoldProvider type : impls)
       {
          if (ConstraintInspector.getName(type.getClass()).equals(scaffoldType))
@@ -206,16 +122,25 @@ public class ScaffoldPlugin implements Plugin
          }
       }
 
-      if ((scaffoldImpl == null) && (scaffoldType != null)
-               && prompt.promptBoolean("No scaffold found for [" + scaffoldType + "], use Forge default?", true))
+      if (!scaffoldImpl.installed(project)
+               && prompt.promptBoolean("Scaffold provider [" + scaffoldType + "] is not installed. Install it?"))
       {
-         scaffoldImpl = defaultScaffold;
+         scaffoldImpl.install(project);
       }
-      else if ((scaffoldImpl == null)
-               && prompt.promptBoolean("No scaffold type was provided, use Forge default?", true))
+      else if (!scaffoldImpl.installed(project))
       {
-         scaffoldImpl = defaultScaffold;
+         throw new RuntimeException("Aborted.");
       }
+
+      if (project.hasFacet(WebResourceFacet.class))
+      {
+         FileResource<?> favicon = project.getFacet(WebResourceFacet.class).getWebResource("/favicon.ico");
+         if (!favicon.exists())
+         {
+            favicon.setContents(getClass().getResourceAsStream("/org/jboss/seam/forge/scaffold/favicon.ico"));
+         }
+      }
+
       return scaffoldImpl;
    }
 
@@ -261,35 +186,68 @@ public class ScaffoldPlugin implements Plugin
       }
    }
 
-   public static void createOrOverwrite(final ShellPrintWriter writer, final FileResource<?> resource,
+   @Command("gen-from-entity")
+   public void generateFromEntity(
+            @Option(name = "scaffoldType", required = false,
+                     completer = ScaffoldProviderCompleter.class) final String scaffoldType,
+            @Option(flagOnly = true, name = "overwrite") final boolean overwrite,
+            @Option(required = false) JavaResource[] targets,
+            final PipeOut out) throws FileNotFoundException
+   {
+      if (((targets == null) || (targets.length < 1))
+               && (currentResource instanceof JavaResource))
+      {
+         targets = new JavaResource[] { (JavaResource) currentResource };
+      }
+
+      List<JavaResource> javaTargets = selectTargets(out, targets);
+      if (javaTargets.isEmpty())
+      {
+         ShellMessages.error(out, "Must specify a domain entity on which to operate.");
+         return;
+      }
+
+      ScaffoldProvider provider = getScaffoldType(scaffoldType);
+
+      for (JavaResource jr : javaTargets)
+      {
+         JavaClass entity = (JavaClass) (jr).getJavaSource();
+         List<Resource<?>> generatedResources = provider.generateFromEntity(project, entity, overwrite);
+
+         // TODO give plugins a chance to react to generated resources, use event bus?
+         if (!generatedResources.isEmpty())
+            generatedEvent.fire(new ScaffoldGeneratedResources(provider, generatedResources));
+
+         ShellMessages.success(out, "Generated UI for [" + entity.getQualifiedName() + "]");
+      }
+
+   }
+
+   public static Resource<?> createOrOverwrite(final ShellPrompt prompt, final FileResource<?> resource,
             final InputStream contents,
             final boolean overwrite)
    {
-      if (!resource.exists() || overwrite)
+      if (!resource.exists() || overwrite
+               || prompt.promptBoolean("[" + resource.getFullyQualifiedName() + "] File exists, overwrite?"))
       {
          resource.createNewFile();
          resource.setContents(contents);
+         return resource;
       }
-      else
-      {
-         ShellMessages.info(writer, "[" + resource.getFullyQualifiedName()
-                           + "] File exists, re-run with `--overwrite` to replace existing files.");
-      }
+      return null;
    }
 
-   public static void createOrOverwrite(final ShellPrintWriter writer, final FileResource<?> resource,
+   public static Resource<?> createOrOverwrite(final ShellPrompt prompt, final FileResource<?> resource,
             final String contents,
             final boolean overwrite)
    {
-      if (!resource.exists() || overwrite)
+      if (!resource.exists() || overwrite
+               || prompt.promptBoolean("[" + resource.getFullyQualifiedName() + "] File exists, overwrite?"))
       {
          resource.createNewFile();
          resource.setContents(contents);
+         return resource;
       }
-      else
-      {
-         ShellMessages.info(writer, "[" + resource.getFullyQualifiedName()
-                           + "] File exists, re-run with `--overwrite` to replace existing files.");
-      }
+      return null;
    }
 }

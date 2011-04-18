@@ -23,6 +23,9 @@ package org.jboss.seam.forge.scaffold;
 
 import org.jboss.seam.forge.parser.java.JavaClass;
 import org.jboss.seam.forge.project.Project;
+import org.jboss.seam.forge.resources.Resource;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -30,9 +33,17 @@ import org.jboss.seam.forge.project.Project;
  */
 public interface ScaffoldProvider
 {
-   void fromEntity(Project project, JavaClass entity, boolean overwrite);
+   List<Resource<?>> generateFromEntity(Project project, JavaClass entity, boolean overwrite);
 
-   void installInto(Project project);
+   List<Resource<?>> generateIndex(Project project, boolean overwrite);
 
-   boolean isInstalledIn(Project project);
+   List<Resource<?>> getGeneratedResources(Project project);
+
+   List<Resource<?>> generateTemplates(Project project, boolean overwrite);
+
+   AccessStrategy getAccessStrategy(Project project);
+
+   List<Resource<?>> install(Project project);
+
+   boolean installed(Project project);
 }

@@ -21,14 +21,6 @@
  */
 package org.jboss.seam.forge.project.facets.builtin;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.context.Dependent;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -47,6 +39,13 @@ import org.jboss.seam.forge.resources.java.JavaResource;
 import org.jboss.seam.forge.shell.plugins.Alias;
 import org.jboss.seam.forge.shell.plugins.RequiresFacet;
 import org.jboss.seam.forge.shell.util.Packages;
+
+import javax.enterprise.context.Dependent;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -169,8 +168,10 @@ public class MavenJavaSourceFacet extends BaseFacet implements JavaSourceFacet, 
          if (javaSourcePlugin == null)
          {
             javaSourcePlugin = new Plugin();
+            // FIXME this should find the most recent version using DependencyResolver
             javaSourcePlugin.setGroupId("org.apache.maven.plugins");
             javaSourcePlugin.setArtifactId("maven-compiler-plugin");
+            javaSourcePlugin.setVersion("2.3.2");
 
             try
             {

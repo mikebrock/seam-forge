@@ -22,14 +22,6 @@
 
 package org.jboss.seam.forge.shell.util;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -37,6 +29,14 @@ import org.jboss.seam.forge.resources.FileResource;
 import org.jboss.seam.forge.shell.Shell;
 import org.jboss.seam.forge.shell.plugins.PipeOut;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Mike Brock .
@@ -110,7 +110,7 @@ public class PluginUtil
    }
 
    public static void downloadFromURL(final PipeOut out, final URL url, final FileResource<?> resource)
-            throws IOException
+         throws IOException
    {
 
       HttpGet httpGetManifest = new HttpGet(url.toExternalForm());
@@ -139,11 +139,11 @@ public class PluginUtil
    private static PluginRef bindToPuginRef(Map<String, String> map)
    {
       return new PluginRef(map.get(PROP_NAME),
-               map.get(PROP_AUTHOR),
-               map.get(PROP_DESCRIPTION),
-               map.get(PROP_ARTIFACT),
-               map.get(PROP_HOME_MAVEN_REPO),
-               map.get(PROP_GIT_REPOSITORY),
-               map.get(PROP_GIT_REF));
+            map.get(PROP_AUTHOR),
+            map.get(PROP_DESCRIPTION),
+            map.get(PROP_ARTIFACT),
+            map.get(PROP_HOME_MAVEN_REPO),
+            map.get(PROP_GIT_REPOSITORY),
+            map.get(PROP_GIT_REF));
    }
 }

@@ -21,25 +21,25 @@
  */
 package org.jboss.seam.forge.shell;
 
+import jline.console.completer.Completer;
+import jline.console.completer.FileNameCompleter;
+import org.jboss.seam.forge.project.services.ResourceFactory;
+import org.jboss.seam.forge.resources.FileResource;
+import org.jboss.seam.forge.resources.Resource;
+import org.jboss.seam.forge.shell.command.PromptTypeConverter;
+import org.jboss.seam.forge.shell.completer.CommandCompleter;
+import org.jboss.seam.forge.shell.completer.CompleterAdaptor;
+import org.jboss.seam.forge.shell.completer.EnumCompleter;
+import org.jboss.seam.forge.shell.util.Enums;
+import org.jboss.seam.forge.shell.util.Files;
+import org.mvel2.DataConversion;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import jline.console.completer.Completer;
-import jline.console.completer.FileNameCompleter;
-
-import org.jboss.seam.forge.project.services.ResourceFactory;
-import org.jboss.seam.forge.resources.FileResource;
-import org.jboss.seam.forge.resources.Resource;
-import org.jboss.seam.forge.shell.command.PromptTypeConverter;
-import org.jboss.seam.forge.shell.completer.CompleterAdaptor;
-import org.jboss.seam.forge.shell.completer.EnumCompleter;
-import org.jboss.seam.forge.shell.util.Enums;
-import org.jboss.seam.forge.shell.util.Files;
-import org.mvel2.DataConversion;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
@@ -93,7 +93,13 @@ public abstract class AbstractShellPrompt implements Shell
    @Override
    public String prompt(final String message)
    {
-      return promptWithCompleter(message, null);
+      return promptCompleter(message, null);
+   }
+
+   @Override
+   public String promptCompleter(String string, CommandCompleter completer)
+   {
+      return promptWithCompleter(string, new CompleterAdaptor(completer));
    }
 
    @Override
@@ -183,17 +189,24 @@ public abstract class AbstractShellPrompt implements Shell
                   "promptChoice() Cannot ask user to select from a list of nothing. Ensure you have values in your options list.");
       }
 
-      int count = 1;
       println(message);
 
       Object result = InvalidInput.INSTANCE;
 
       while (result instanceof InvalidInput)
       {
+         int count = 1;
          println();
          for (Object entry : options)
          {
-            println("  " + count + " - [" + entry + "]");
+            if (entry != null)
+            {
+               println("  " + count + " - [" + entry + "]");
+            }
+            else
+            {
+               println("  " + count + " - (none)");
+            }
             count++;
          }
          println();
@@ -224,17 +237,24 @@ public abstract class AbstractShellPrompt implements Shell
          return options.get(0);
       }
 
-      int count = 1;
       println(message);
 
       Object result = InvalidInput.INSTANCE;
 
       while (result instanceof InvalidInput)
       {
+         int count = 1;
          println();
          for (T entry : options)
          {
-            println("  " + count + " - [" + entry + "]");
+            if (entry != null)
+            {
+               println("  " + count + " - [" + entry + "]");
+            }
+            else
+            {
+               println("  " + count + " - (none)");
+            }
             count++;
          }
          println();
@@ -265,18 +285,30 @@ public abstract class AbstractShellPrompt implements Shell
          return options.get(0);
       }
 
-      int count = 1;
       println(message);
 
       Object result = InvalidInput.INSTANCE;
 
       while (result instanceof InvalidInput)
       {
+         int count = 1;
          println();
          for (T entry : options)
          {
-            print("  " + count + " - [" + entry + "]");
-            if (entry.equals(defaultIfEmpty))
+            if (entry != null && entry.equals(defaultIfEmpty))
+            {
+               print(ShellColor.BOLD, "  " + count + " - [" + entry + "]");
+            }
+            else if (entry != null)
+            {
+               print("  " + count + " - [" + entry + "]");
+            }
+            else if (defaultIfEmpty == null)
+            {
+               print(ShellColor.BOLD, "  " + count + " - (none)");
+            }
+
+            if (entry == defaultIfEmpty || (entry != null && entry.equals(defaultIfEmpty)))
             {
                print("*");
             }
@@ -284,7 +316,9 @@ public abstract class AbstractShellPrompt implements Shell
             count++;
          }
          println();
-         int input = prompt("Choose an option by typing the number of the selection [*-default]: ",
+         int input = prompt(
+                  "Choose an option by typing the number of the selection "
+                           + renderColor(ShellColor.BOLD, "[*-default]: "),
                   Integer.class, 0) - 1;
          if ((input >= 0) && (input < options.size()))
          {
@@ -306,7 +340,6 @@ public abstract class AbstractShellPrompt implements Shell
    @SuppressWarnings("unchecked")
    public <T> T promptChoice(final String message, final Map<String, T> options)
    {
-      int count = 1;
       println(message);
       List<Entry<String, T>> entries = new ArrayList<Map.Entry<String, T>>();
       entries.addAll(options.entrySet());
@@ -314,6 +347,7 @@ public abstract class AbstractShellPrompt implements Shell
       Object result = InvalidInput.INSTANCE;
       while (result instanceof InvalidInput)
       {
+         int count = 1;
          println();
          for (Entry<String, T> entry : entries)
          {

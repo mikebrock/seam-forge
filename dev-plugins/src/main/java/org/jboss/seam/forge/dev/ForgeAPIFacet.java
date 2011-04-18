@@ -4,10 +4,6 @@
 
 package org.jboss.seam.forge.dev;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.jboss.seam.forge.project.dependencies.Dependency;
 import org.jboss.seam.forge.project.dependencies.DependencyBuilder;
 import org.jboss.seam.forge.project.facets.BaseFacet;
@@ -18,7 +14,10 @@ import org.jboss.seam.forge.shell.Shell;
 import org.jboss.seam.forge.shell.plugins.Alias;
 import org.jboss.seam.forge.shell.plugins.RequiresFacet;
 import org.jboss.seam.forge.shell.plugins.RequiresPackagingType;
-import org.jboss.seam.forge.spec.cdi.CDIFacet;
+import org.jboss.seam.forge.spec.javaee6.cdi.CDIFacet;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
