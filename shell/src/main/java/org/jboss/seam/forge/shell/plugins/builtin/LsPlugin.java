@@ -57,7 +57,7 @@ import org.jboss.seam.forge.shell.util.GeneralUtils;
 
 /**
  * Lists directory contents for filesystem based directories. This is a simplified version of the UNIX 'ls' command and
- * currently supports the - and -a flags, as in unix.
+ * currently supports the -l and -a flags, as in unix.
  * 
  * @author Mike Brock
  */

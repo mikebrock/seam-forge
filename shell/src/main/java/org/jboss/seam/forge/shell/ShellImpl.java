@@ -76,6 +76,7 @@ import static org.mvel2.DataConversion.addConversionHandler;
 
 /**
  * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
+ * @author Mike Brock <cbrock@redhat.com>
  */
 @ApplicationScoped
 @SuppressWarnings("restriction")
