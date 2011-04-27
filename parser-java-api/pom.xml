@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jboss.seam.forge</groupId>
+        <groupId>org.jboss.forge</groupId>
         <artifactId>forge-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -10,7 +10,7 @@
 
     <artifactId>forge-parser-java-api</artifactId>
     <packaging>jar</packaging>
-    <name>Seam Forge - Parser/Java API</name>
+    <name>Forge - Parser/Java API</name>
 
     <dependencies>
         <dependency>

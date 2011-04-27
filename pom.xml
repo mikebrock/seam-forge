@@ -7,12 +7,12 @@
 		<version>15</version>
 	</parent>
 
-	<groupId>org.jboss.seam.forge</groupId>
+	<groupId>org.jboss.forge</groupId>
 	<artifactId>forge-parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Seam Forge - Parent</name>
+	<name>Forge - Parent</name>
 	<description>Simplified project bootstrapping, incremental
         enhancement framework, and plugins
    </description>
@@ -22,18 +22,21 @@
 	</prerequisites>
 
 	<modules>
-		<module>event-bus</module>
-		<module>git-tools</module>
+		<module>event-bus-api</module>
 		<module>parser-java-api</module>
-		<module>parser-java</module>
 		<module>parser-xml</module>
-		<module>project-model</module>
-		<module>project-model-tests</module>
+		<module>maven-api</module>
 		<module>shell-api</module>
+		<module>git-tools</module>
+		<module>parser-java</module>
+		<module>project-model-maven</module>
+		<module>project-model-maven-tests</module>
 		<module>test-harness</module>
 		<module>shell</module>
-		<module>java-ee6-plugins</module>
-		<module>scaffold-plugin</module>
+		<module>javaee-api</module>
+		<module>javaee-impl</module>
+		<module>scaffold-api</module>
+		<module>scaffold-plugins</module>
 		<module>scaffold-metawidget</module>
 		<module>dev-plugins</module>
 	</modules>
@@ -74,52 +77,67 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-parser-java-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-parser-java</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<artifactId>forge-parser-xml</artifactId>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-git-tools</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
-				<artifactId>forge-project-model</artifactId>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-maven-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-project-model-maven</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-shell</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-shell-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
-				<artifactId>forge-javaee-6.0-plugins</artifactId>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-javaee-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
-				<artifactId>forge-scaffold</artifactId>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-javaee-integration</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.seam.forge</groupId>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-scaffold-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.forge</groupId>
+				<artifactId>forge-scaffold-plugins</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.forge</groupId>
 				<artifactId>forge-test-harness</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -330,7 +348,7 @@
 							<!-- <ignore></ignore> -->
 						</ignores>
 						<excludes>
-							<exclude>org/jboss/seam/forge/**/*.class</exclude>
+							<exclude>org/jboss/forge/**/*.class</exclude>
 						</excludes>
 					</instrumentation>
 				</configuration>
